@@ -92,3 +92,56 @@ else:
 st.dataframe(ranked, use_container_width=True, hide_index=True)
 st.caption("Score = 70% skill fit + 30% available capacity. "
            "The PM always makes the final call — this is decision support, not auto-assignment.")
+# --- Section 3: Delivery scenario simulation ---
+st.header("3️⃣ Simulate the launch")
+
+st.write("Define the launch backlog (edit freely):")
+default_backlog = pd.DataFrame({
+    "task_name": ["Payments integration", "Rider app screens", "Pricing model",
+                  "Push notifications", "Final design QA"],
+    "task_type": ["Backend", "Mobile", "Data", "Backend", "Design"],
+    "complexity": ["High", "High", "Medium", "Medium", "Low"],
+    "estimated_days": [8, 10, 6, 5, 2],
+})
+backlog = st.data_editor(default_backlog, num_rows="dynamic", use_container_width=True)
+
+colA, colB, colC = st.columns(3)
+start_date = colA.date_input("Start date", pd.Timestamp.today())
+target_days = colB.number_input("Target deadline (days from start)", 10, 200, 45)
+n_sims = colC.selectbox("Simulations", [1000, 5000, 10000], index=1)
+
+if st.button("🎲 Run simulation", type="primary"):
+    # predicted duration per task from Section 1's model
+    preds = [predict_days(r.task_type, r.complexity, r.estimated_days)[0]
+             for r in backlog.itertuples()]
+
+    rng = np.random.default_rng(42)
+    totals = np.zeros(n_sims)
+    for p in preds:
+        # triangular: best case 80%, most likely = prediction, worst 160%
+        totals += rng.triangular(0.8 * p, p, 1.6 * p, n_sims)
+
+    p50, p90 = np.percentile(totals, [50, 90])
+    on_time = (totals <= target_days).mean()
+
+    m1, m2, m3 = st.columns(3)
+    m1.metric("P50 delivery", (pd.Timestamp(start_date) +
+              pd.Timedelta(days=p50)).strftime("%d %b %Y"), f"{p50:.0f} days")
+    m2.metric("P90 delivery", (pd.Timestamp(start_date) +
+              pd.Timedelta(days=p90)).strftime("%d %b %Y"), f"{p90:.0f} days")
+    m3.metric(f"Odds of hitting day {target_days}", f"{on_time:.0%}")
+
+    hist, edges = np.histogram(totals, bins=30)
+    chart = pd.DataFrame({"days": edges[:-1].round(0), "runs": hist}).set_index("days")
+    st.bar_chart(chart)
+
+    if on_time < 0.5:
+        st.error("🚨 Under 50% confidence — descope, add capacity, or move the date.")
+    elif on_time < 0.8:
+        st.warning("⚠️ Moderate risk — consider trimming scope or de-risking the biggest tasks.")
+    else:
+        st.success("✅ High confidence in the target date.")
+
+    st.caption("Each simulation draws every task's duration from a triangular distribution "
+               "(80% best case, AI prediction as most likely, 160% worst case) and assumes "
+               "sequential execution — a conservative critical-path view.")
