@@ -1,0 +1,41 @@
+task_id,task_name,task_type,complexity,estimated_days,actual_days
+T001,Payment retry logic,Backend,High,8,14
+T002,Login screen redesign,Frontend,Low,3,3
+T003,Push notification service,Backend,Medium,5,7
+T004,Rider rating widget,Frontend,Medium,4,5
+T005,Trip history API,Backend,Medium,6,9
+T006,Onboarding flow copy,Design,Low,2,2
+T007,Fraud detection rules,Data,High,10,16
+T008,Apple Pay integration,Mobile,High,9,17
+T009,Promo code engine,Backend,High,7,13
+T010,Map pin clustering,Mobile,Medium,5,8
+T011,A/B test framework,Data,Medium,6,8
+T012,Referral banner,Frontend,Low,2,2
+T013,Driver heatmap,Data,High,9,14
+T014,Wallet top-up flow,Mobile,Medium,6,9
+T015,Search autocomplete,Backend,Medium,5,7
+T016,Dark mode support,Mobile,Low,4,5
+T017,Checkout redesign,Frontend,High,8,11
+T018,ETA prediction model,Data,High,12,19
+T019,Rate limiting,Backend,Low,3,4
+T020,Localization AR/EN,Frontend,Medium,5,6
+T021,Subscription billing,Backend,High,9,16
+T022,In-app chat,Mobile,High,10,18
+T023,Analytics dashboard,Data,Medium,6,8
+T024,Empty states design,Design,Low,2,2
+T025,Password reset flow,Backend,Low,3,3
+T026,Voucher wallet UI,Frontend,Medium,4,6
+T027,Surge pricing logic,Data,High,10,17
+T028,Deep linking,Mobile,Medium,5,7
+T029,Order tracking page,Frontend,Medium,5,7
+T030,GDPR data export,Backend,Medium,6,8
+T031,Splash screen refresh,Design,Low,1,1
+T032,Card tokenization,Backend,High,8,15
+T033,Offline mode,Mobile,High,11,20
+T034,Cohort retention report,Data,Medium,5,7
+T035,Address book feature,Frontend,Medium,4,5
+T036,Webhook system,Backend,Medium,6,9
+T037,Biometric login,Mobile,Medium,6,8
+T038,Design system tokens,Design,Medium,4,5
+T039,Churn prediction model,Data,High,11,18
+T040,Invoice PDF generator,Backend,Low,3,4
