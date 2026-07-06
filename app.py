@@ -56,3 +56,39 @@ c3.metric("AI-predicted duration", f"{predicted:.1f} days",
 
 st.info("💡 The model learns each segment's estimate-vs-actual ratio from history. "
         "With real Jira data, this would retrain continuously as tasks complete.")
+# --- Section 2: Owner assignment ---
+st.header("2️⃣ Recommend an owner")
+
+def score_owner(row, task_type):
+    skills = row.skills.split("|")
+    skill_score = 1.0 if task_type in skills else 0.0
+    free_slots = row.max_capacity - row.active_tasks
+    capacity_score = max(free_slots, 0) / row.max_capacity
+    # 70% skill fit, 30% availability
+    return 0.7 * skill_score + 0.3 * capacity_score, skill_score, capacity_score
+
+scores = []
+for _, member in team.iterrows():
+    total, skill_s, cap_s = score_owner(member, new_type)
+    scores.append({
+        "name": member["name"],
+        "role": member.role,
+        "skill_match": "✅" if skill_s == 1 else "—",
+        "load": f"{member.active_tasks}/{member.max_capacity}",
+        "score": round(total, 2),
+    })
+
+ranked = pd.DataFrame(scores).sort_values("score", ascending=False).reset_index(drop=True)
+best = ranked.iloc[0]
+
+if best.score >= 0.7:
+    st.success(f"**Recommended owner: {best['name']}** ({best.role}) — "
+               f"skill match, load {best.load}")
+else:
+    st.warning(f"⚠️ No one with **{new_type}** skills has free capacity. "
+               f"Best available: **{best['name']}** ({best.role}). "
+               "Consider re-sequencing or borrowing from another squad.")
+
+st.dataframe(ranked, use_container_width=True, hide_index=True)
+st.caption("Score = 70% skill fit + 30% available capacity. "
+           "The PM always makes the final call — this is decision support, not auto-assignment.")
